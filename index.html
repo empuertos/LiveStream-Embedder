@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Stream Embedder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .iframe-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+        }
+        .iframe-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .stream-preview {
+            background-color: #1a1a1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        @media (max-width: 768px) {
+            .controls-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <header class="bg-indigo-700 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 rounded-full bg-indigo-500 flex items-center justify-center">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/d5f32532-2293-420f-8092-f18990a71dde.png" alt="LiveStream Pro logo - a purple play button inside a circle" class="w-full h-full rounded-full">
+                    </div>
+                    <h1 class="text-2xl font-bold">LiveStream Embedder</h1>
+                </div>
+                <nav>
+                    <ul class="flex space-x-6">
+                        <li><a href="#" class="hover:text-indigo-200">Home</a></li>
+                        <li><a href="#" class="hover:text-indigo-200">Features</a></li>
+                        <li><a href="#" class="hover:text-indigo-200">Support</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-xl font-semibold text-gray-800">Live Stream Controls</h2>
+                <p class="text-gray-600 mt-2">Embed and customize your live stream</p>
+            </div>
+
+            <div class="controls-container flex flex-row p-6 gap-6">
+                <div class="w-full md:w-1/2">
+                    <div class="space-y-4">
+                        <div>
+                            <label for="streamUrl" class="block text-sm font-medium text-gray-700">Stream URL</label>
+                            <input type="url" id="streamUrl" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" placeholder="https://example.com/live">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="width" class="block text-sm font-medium text-gray-700">Width</label>
+                                <input type="number" id="width" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" value="640">
+                            </div>
+                            <div>
+                                <label for="height" class="block text-sm font-medium text-gray-700">Height</label>
+                                <input type="number" id="height" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" value="360">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="aspectRatio" class="block text-sm font-medium text-gray-700">Aspect Ratio</label>
+                            <select id="aspectRatio" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border">
+                                <option value="16:9">16:9 (Widescreen)</option>
+                                <option value="4:3">4:3 (Standard)</option>
+                                <option value="1:1">1:1 (Square)</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <button onclick="updateStream()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md transition duration-150 ease-in-out">
+                                Update Stream
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-full md:w-1/2">
+                    <div class="border border-gray-200 rounded-lg overflow-hidden">
+                        <div class="bg-gray-50 p-3 border-b border-gray-200">
+                            <h3 class="text-sm font-medium text-gray-700">Live Preview</h3>
+                        </div>
+                        <div class="stream-preview">
+                            <div class="iframe-container" id="streamContainer">
+                                <iframe id="liveStream" src="" allowfullscreen></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8 bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-xl font-semibold text-gray-800">Embed Code</h2>
+                <p class="text-gray-600 mt-2">Copy this code to embed your stream elsewhere</p>
+            </div>
+            <div class="p-6">
+                <pre id="embedCode" class="bg-gray-100 p-4 rounded text-sm overflow-x-auto"><iframe src="" width="640" height="360" frameborder="0" allowfullscreen></iframe></pre>
+                <button onclick="copyEmbedCode()" class="mt-4 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-md transition duration-150 ease-in-out">
+                    Copy to Clipboard
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <div class="flex items-center space-x-2">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/0904f731-a88e-427a-bae1-4b4fe37ad561.png" alt="LiveStream Pro logo mark - a simplified purple play button" class="w-8 h-8">
+                        <span class="font-bold">LiveStream Embedder</span>
+                    </div>
+                    <p class="text-gray-400 text-sm mt-2">Easy streaming integration for everyone</p>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-white">Terms</a>
+                    <a href="#" class="text-gray-400 hover:text-white">Privacy</a>
+                    <a href="#" class="text-gray-400 hover:text-white">Contact</a>
+                </div>
+            </div>
+            <div class="mt-6 pt-6 border-t border-gray-700 text-center text-gray-400 text-sm">
+                © 2023 LiveStream Embedder. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function updateStream() {
+            const streamUrl = document.getElementById('streamUrl').value;
+            const width = document.getElementById('width').value;
+            const height = document.getElementById('height').value;
+            const aspectRatio = document.getElementById('aspectRatio').value;
+            
+            if (streamUrl) {
+                const iframe = document.getElementById('liveStream');
+                
+                // Update iframe source
+                iframe.src = streamUrl;
+                
+                // Update aspect ratio
+                const container = document.getElementById('streamContainer');
+                if (aspectRatio === '16:9') {
+                    container.style.paddingBottom = '56.25%';
+                } else if (aspectRatio === '4:3') {
+                    container.style.paddingBottom = '75%';
+                } else if (aspectRatio === '1:1') {
+                    container.style.paddingBottom = '100%';
+                }
+                
+                // Update embed code
+                document.getElementById('embedCode').textContent = 
+                    `<iframe src="${streamUrl}" width="${width}" height="${height}" frameborder="0" allowfullscreen></iframe>`;
+            } else {
+                alert('Please enter a valid stream URL');
+            }
+        }
+        
+        function copyEmbedCode() {
+            const embedCode = document.getElementById('embedCode').textContent;
+            navigator.clipboard.writeText(embedCode).then(() => {
+                alert('Embed code copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+        
+        // Initialize with a placeholder
+        window.onload = function() {
+            document.getElementById('streamUrl').value = 'https://www.youtube.com/embed/live_stream?channel=UCBR8-60-B28hp2BmDPdntcQ';
+            updateStream();
+        };
+    </script>
+</body>
+</html>
+
